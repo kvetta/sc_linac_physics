@@ -69,7 +69,6 @@ def plot_cavity_data(cavity_data, cryomodule, timestamp, output_path):
         ax.set_ylabel("Amplitude (MV)")
         fig.autofmt_xdate()
         ax.legend(loc="lower right")
-        #   plt.show()
         fig.savefig(f"/{output_path}/amp_plot_cm{cryomodule}_{timestamp}.png")
         plt.close(fig)
     return

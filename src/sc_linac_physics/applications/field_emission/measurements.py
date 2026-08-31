@@ -6,7 +6,7 @@ from datetime import datetime
 
 _DATA_DIR = Path(__file__).resolve().parent
 input_csv = _DATA_DIR / "All FE measurements by CM.csv"
-h5_filename = _DATA_DIR / "field_emission_data_no1.hdf5"
+h5_filename = _DATA_DIR / "field_emission_data.hdf5"
 
 
 def match_measurement_dates(cryomodule):
