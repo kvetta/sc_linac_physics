@@ -18,7 +18,7 @@ _DATA_DIR = Path(__file__).resolve().parent
 DEFAULT_INPUT_CSV = _DATA_DIR
 DEFAULT_OUTPUT_FOLDER = _DATA_DIR
 INPUT_CSVS = glob.glob(os.path.join(DEFAULT_INPUT_CSV, "*.csv"))
-H5_FILENAME = "field_emission_data_test.hdf5"
+H5_FILENAME = "field_emission_data.hdf5"
 ALL_CM_CSV = "All FE measurements by CM.csv"
 
 metadata_lookup = {}  # key: (cm, month, day, year, hour, minute) -> row
