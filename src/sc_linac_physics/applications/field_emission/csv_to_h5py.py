@@ -4,6 +4,7 @@ import re
 import glob
 import h5py
 import pandas as pd
+from pathlib import Path
 
 """
 07/13/26 - Kvetta Q
@@ -12,13 +13,16 @@ READOUT/INSTANT READOUT hierarchy for a folder of .CSVs with specific naming con
 ex: cm08_23_10_06_08_42_cavity7_average.csv.
 """
 
-input_path = "/Users/kvetta/Desktop/combined_data/"
-input_csvs = glob.glob(os.path.join(input_path, "*.csv"))
-h5_filename = "field_emission_data.hdf5"
-all_cm_csv = "All FE measurements by CM.csv"
+
+_DATA_DIR = Path(__file__).resolve().parent
+DEFAULT_INPUT_CSV = _DATA_DIR
+DEFAULT_OUTPUT_FOLDER = _DATA_DIR
+INPUT_CSVS = glob.glob(os.path.join(DEFAULT_INPUT_CSV, "*.csv"))
+H5_FILENAME = "field_emission_data_test.hdf5"
+ALL_CM_CSV = "All FE measurements by CM.csv"
 
 metadata_lookup = {}  # key: (cm, month, day, year, hour, minute) -> row
-with open(all_cm_csv) as csvfile:
+with open(ALL_CM_CSV) as csvfile:
     reader = csv.reader(csvfile)
     next(reader)  # skip header
     for row in reader:
@@ -41,8 +45,8 @@ with open(all_cm_csv) as csvfile:
         except (ValueError, IndexError):
             print(f"Malformed CSV row: {row}")
 
-with h5py.File(h5_filename, "a") as h5f:
-    for csv_path in input_csvs:
+with h5py.File(H5_FILENAME, "a") as h5f:
+    for csv_path in INPUT_CSVS:
         csv_name = os.path.basename(csv_path)
 
         match = re.fullmatch(
