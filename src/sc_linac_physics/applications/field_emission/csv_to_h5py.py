@@ -68,7 +68,6 @@ with h5py.File(H5_FILENAME, "a") as h5f:
             # define attributes at the date level
             date_group = h5f.require_group(f"CM{cm}/{date}")
             date_group.attrs["cryomodule"] = cm
-            date_group.attrs["cavity"] = cav
 
             key = (cm, mo, dd, yy, hh, mn)
             if key in metadata_lookup:
@@ -89,6 +88,7 @@ with h5py.File(H5_FILENAME, "a") as h5f:
 
             # store dataset at the cavity/readout level
             cav_group = h5f.require_group(f"CM{cm}/{date}/CAV{cav}")
+            cav_group.attrs["cavity"] = cav
             dset = cav_group.require_dataset(
                 f"{readout_type}",
                 shape=values.shape,
