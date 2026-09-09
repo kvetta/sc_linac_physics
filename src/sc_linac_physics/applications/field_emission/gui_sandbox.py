@@ -23,7 +23,6 @@ from PyQt5.QtWidgets import (
 )
 from pydm import Display, PyDMApplication
 from matplotlib.figure import Figure
-from sc_linac_physics.utils.sc_linac.linac_utils import LINAC_CM_DICT
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar,
@@ -33,12 +32,14 @@ from measurements import (
     fetch_measurement_metadata,
     find_dataframes,
 )
+from sc_linac_physics.applications.field_emission.constants import (
+    VALID_CMS_LIST,
+    CAV_RANGE,
+    RAD_CHAN_RANGE,
+)
 from plot_me import plot_amp_vs_rad
-from update_h5py import parse_csv, receive_metadata_input
 
-# LINAC CONFIGURATION
-VALID_LINACS = {0, 1, 2, 3}
-VALID_CMS = {key: LINAC_CM_DICT[key] for key in VALID_LINACS}
+# from update_h5py import parse_csv, receive_metadata_input
 
 
 class UpdateButtons(QDialog):
@@ -59,15 +60,15 @@ class UpdateButtons(QDialog):
     def update_in_single_mode(self):
         dialog = SingleInputDialog()
         if dialog.exec():
-            # print(dialog.get_inputs())
-            receive_metadata_input(dialog.get_inputs())
+            print(dialog.get_inputs())
+            # receive_metadata_input(dialog.get_inputs())
             self.accept()
 
     def update_in_multi_mode(self):
         dialog = MultiInputDialog()
         if dialog.exec():
-            # print(dialog.get_input())
-            parse_csv(dialog.get_input())
+            print(dialog.get_input())
+            # parse_csv(dialog.get_input())
             self.accept()
 
 
@@ -265,9 +266,7 @@ class FieldEmission(Display):
         cryo_sel_layout = QHBoxLayout()
         cryo_sel_layout.addWidget(QLabel("Cryomodule"))
         self.cryo_dropdown = QComboBox()
-        self.cryo_dropdown.addItems(
-            [str(cm) for linac in VALID_CMS.values() for cm in linac]
-        )
+        self.cryo_dropdown.addItems(VALID_CMS_LIST)
         self.cryo_dropdown.setCurrentIndex(-1)
         cryo_sel_layout.addWidget(self.cryo_dropdown)
         linac_layout.addLayout(cryo_sel_layout)
@@ -275,7 +274,7 @@ class FieldEmission(Display):
         # Cavity Selection
         cav_channels = QGroupBox("Cavity Selection")
         cav_layout, self.cavity_cb = self._checkbox_helper(
-            [f"Cavity {i}" for i in range(1, 9)], 4
+            [f"Cavity {i}" for i in CAV_RANGE], 4
         )
         cav_channels.setLayout(cav_layout)
         linac_layout.addWidget(cav_channels)
@@ -441,7 +440,7 @@ class FieldEmission(Display):
         # Decarad Channel Selection
         rad_channels = QGroupBox("Channel Selection")
         rad_channel_layout, self.rad_chan_cb = self._checkbox_helper(
-            [f"Ch {i}" for i in range(1, 11)], 5
+            [f"Ch {i}" for i in RAD_CHAN_RANGE], 5
         )
         rad_channels.setLayout(rad_channel_layout)
         return rad_channels

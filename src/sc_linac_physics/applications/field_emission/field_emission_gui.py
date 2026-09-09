@@ -19,7 +19,6 @@ from PyQt5.QtWidgets import (
 )
 from pydm import Display, PyDMApplication
 from matplotlib.figure import Figure
-from sc_linac_physics.utils.sc_linac.linac_utils import LINAC_CM_DICT
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import (
     NavigationToolbar2QT as NavigationToolbar,
@@ -30,10 +29,11 @@ from sc_linac_physics.applications.field_emission.measurements import (
     find_dataframes,
 )
 from sc_linac_physics.applications.field_emission.plot_me import plot_amp_vs_rad
-
-# LINAC CONFIGURATION
-VALID_LINACS = {0, 1, 2, 3}
-VALID_CMS = {key: LINAC_CM_DICT[key] for key in VALID_LINACS}
+from sc_linac_physics.applications.field_emission.constants import (
+    VALID_CMS_LIST,
+    CAV_RANGE,
+    RAD_CHAN_RANGE,
+)
 
 
 class FieldEmission(Display):
@@ -156,9 +156,7 @@ class FieldEmission(Display):
         cryo_sel_layout = QHBoxLayout()
         cryo_sel_layout.addWidget(QLabel("Cryomodule"))
         self.cryo_dropdown = QComboBox()
-        self.cryo_dropdown.addItems(
-            [str(cm) for linac in VALID_CMS.values() for cm in linac]
-        )
+        self.cryo_dropdown.addItems(VALID_CMS_LIST)
         self.cryo_dropdown.setCurrentIndex(-1)
         cryo_sel_layout.addWidget(self.cryo_dropdown)
         linac_layout.addLayout(cryo_sel_layout)
@@ -166,7 +164,7 @@ class FieldEmission(Display):
         # Cavity selection checkboxes
         cav_channels = QGroupBox("Cavity Selection")
         cav_layout, self.cavity_cb = self._checkbox_helper(
-            [f"Cavity {i}" for i in range(1, 9)], 4
+            [f"Cavity {i}" for i in CAV_RANGE], 4
         )
         cav_channels.setLayout(cav_layout)
         linac_layout.addWidget(cav_channels)
@@ -332,7 +330,7 @@ class FieldEmission(Display):
         # Decarad channel selection checkboxes
         rad_channels = QGroupBox("Channel Selection")
         rad_channel_layout, self.rad_chan_cb = self._checkbox_helper(
-            [f"Ch {i}" for i in range(1, 11)], 5
+            [f"Ch {i}" for i in RAD_CHAN_RANGE], 5
         )
         rad_channels.setLayout(rad_channel_layout)
         return rad_channels
