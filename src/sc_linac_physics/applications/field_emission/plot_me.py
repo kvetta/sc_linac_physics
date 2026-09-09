@@ -6,6 +6,10 @@ from scipy.optimize import curve_fit
 from sc_linac_physics.applications.field_emission.measurements import (
     get_columns,
 )
+from sc_linac_physics.applications.field_emission.constants import (
+    NUM_FIT_POINTS,
+    NUM_FIT_ITERATIONS,
+)
 
 
 def plot_amp_vs_rad(df, ax, r_channels, fit):
@@ -48,12 +52,14 @@ def add_poly_fit(amp, rad, axis, label, color):
     if rad.size == 0:
         return None
     try:
-        param, param_covar = curve_fit(fit_equation, amp, rad, maxfev=5500)
+        param, param_covar = curve_fit(
+            fit_equation, amp, rad, maxfev=NUM_FIT_ITERATIONS
+        )
     except RuntimeError:
         print("RuntimeError: fit did not converge. Skipping channel")
         return None
 
-    x = np.linspace(amp.min(), amp.max(), 250)
+    x = np.linspace(amp.min(), amp.max(), NUM_FIT_POINTS)
     y = fit_equation(x, *param)
     (line,) = axis.plot(x, y, ls="-", label=label, color=color)
     patch = mpatch.Patch(

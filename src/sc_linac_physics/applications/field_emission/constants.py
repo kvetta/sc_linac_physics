@@ -36,10 +36,8 @@ DISPLAY_DATE_FORMAT = "%A, %B %d, %Y"
 AMPLITUDE_THRESHOLD = 4  # below this MVoltage, the cavity is considered off
 
 # Plotting
-NUM_FIT_LINE_POINTS = 250  # how many data points in fit line
-NUM_FIT_LINE_ITERATIONS = (
-    5500  # how many tries scipy curve fit takes to converge
-)
+NUM_FIT_POINTS = 250  # how many data points in fit line
+NUM_FIT_ITERATIONS = 5500  # how many tries scipy curve fit takes to converge
 
 # Regex Patterns
 DATA_CSV_NAME = re.compile(
