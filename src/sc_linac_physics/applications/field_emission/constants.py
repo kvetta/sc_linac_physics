@@ -9,6 +9,11 @@ CSV_OUTPUT_DIR = _DATA_DIR
 H5_PATH = _DATA_DIR / "field_emission_data.hdf5"
 ALL_MEASUREMENTS_CSV = _DATA_DIR / "All FE measurements by CM.csv"
 
+# HDF5 Group Paths
+H5_MEASUREMENT_PATH = "CM{cm}/{date}"
+H5_CAVITY_PATH = "CM{cm}/{date}/CAV{cav}"
+H5_READOUT_PATH = "CM{cm}/{date}/CAV{cav}/{readout}"
+
 # Linac Configuration
 VALID_LINACS = {0, 1, 2, 3}  # to include linac 4B when ready
 VALID_CMS_BY_LINAC = {key: LINAC_CM_DICT[key] for key in VALID_LINACS}

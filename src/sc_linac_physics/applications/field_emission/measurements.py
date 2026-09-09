@@ -1,20 +1,25 @@
 import h5py
 import re
 import pandas as pd
-from pathlib import Path
-from datetime import datetime
 
-_DATA_DIR = Path(__file__).resolve().parent
-h5_filename = _DATA_DIR / "field_emission_data.hdf5"
+from datetime import datetime
+from sc_linac_physics.applications.field_emission.constants import (
+    H5_PATH,
+    H5_DATE_FORMAT,
+    H5_MEASUREMENT_PATH,
+    H5_READOUT_PATH,
+    DISPLAY_DATE_FORMAT,
+    AMPLITUDE_THRESHOLD,
+)
 
 
 def match_measurement_dates(cryomodule):
     """match cryomodule str to available measurement dates in h5 file"""
     measurements = []
-    with h5py.File(h5_filename, "r") as h5f:
+    with h5py.File(H5_PATH, "r") as h5f:
         h5_cryo = h5f.get(f"CM{cryomodule}")
         for date in h5_cryo:
-            h5_date = datetime.strptime(date, "%Y-%m-%d_%H%M")
+            h5_date = datetime.strptime(date, H5_DATE_FORMAT)
             display_str = f"CM{cryomodule}    {h5_date}"
             measurements.append(
                 {
@@ -28,14 +33,16 @@ def match_measurement_dates(cryomodule):
 
 def fetch_measurement_metadata(cm, date):
     """use measurement to find metadata about selected measurement date from h5 file"""
-    formatted_date = datetime.strftime(date, "%Y-%m-%d_%H%M")
-    with h5py.File(h5_filename, "r") as h5f:
-        h5f_date_group = h5f.get(f"CM{cm}/{formatted_date}")
+    h5_date = datetime.strftime(date, H5_DATE_FORMAT)
+    with h5py.File(H5_PATH, "r") as h5f:
+        h5f_date_group = h5f.get(
+            H5_MEASUREMENT_PATH.format(cm=cm, date=h5_date)
+        )
         if h5f_date_group is None:
             return None
         date = h5f_date_group.attrs["date"]
         formatted_date = datetime.strptime(date, "%m/%d/%y")
-        date_str = formatted_date.strftime("%A, %B %d, %Y")
+        date_str = formatted_date.strftime(DISPLAY_DATE_FORMAT)
         return (
             date_str,
             h5f_date_group.attrs["time_start"],
@@ -49,14 +56,16 @@ def fetch_measurement_metadata(cm, date):
 def find_dataframes(cm, date, cav, read):
     """search h5 file for matching datasets to create dataframes for plotting"""
     readout = read.lower()
-    stripped_date = datetime.strftime(date, "%Y-%m-%d_%H%M")
+    h5_date = datetime.strftime(date, H5_DATE_FORMAT)
     cav_list = [i + 1 for i, c in enumerate(cav) if c]
     if not cav_list:
         return {}, "", 0
-    with h5py.File(h5_filename, "r") as h5f:
+    with h5py.File(H5_PATH, "r") as h5f:
         dfs = {}
         for c in cav_list:
-            filepath = f"CM{cm}/{stripped_date}/CAV{c}/{readout}"
+            filepath = H5_READOUT_PATH.format(
+                cm=cm, date=h5_date, cav=c, readout=readout
+            )
             dataset = h5f[filepath]
             df = pd.DataFrame(dataset)
             dfs[c] = df
@@ -75,7 +84,7 @@ def find_dataframes(cm, date, cav, read):
 
 def get_columns(df, r_channels):
     # eliminate rows under active amplitude threshold voltage
-    threshold = 4
+    threshold = AMPLITUDE_THRESHOLD
     df2 = df.mask(df.iloc[:, 0] < threshold)
     # grab columns corresponding to channels
     idx_list = [i + 1 for i, chan in enumerate(r_channels) if chan]
