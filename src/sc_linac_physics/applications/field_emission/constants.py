@@ -5,7 +5,7 @@ from sc_linac_physics.utils.sc_linac.linac_utils import LINAC_CM_DICT
 # Default File Paths
 _DATA_DIR = Path(__file__).resolve().parent
 
-CSV_OUTPUT_DIR = _DATA_DIR / "csv_output"
+CSV_OUTPUT_DIR = _DATA_DIR
 H5_PATH = _DATA_DIR / "field_emission_data.hdf5"
 ALL_MEASUREMENTS_CSV = _DATA_DIR / "All FE measurements by CM.csv"
 
@@ -20,12 +20,11 @@ CAV_RANGE = list(range(1, CAVITIES + 1))
 # Decarad Readouts
 RAD_CHANNELS = 10  # number of decarad channels
 RAD_CHAN_RANGE = list(range(1, RAD_CHANNELS + 1))
-RAD_READ_TYPE = ["average", "instant"]
+RAD_READ_TYPES = ["average", "instant"]
 
-# H5 Formatting
+# Date Formatting
+CSV_DATE_FORMAT = "%y_%m_%d_%H_%M"
 H5_DATE_FORMAT = "%Y-%m-%d_%H%M"
-
-# Display Formatting
 DISPLAY_DATE_FORMAT = "%A, %B %d, %Y"
 
 # Measurements

@@ -1,9 +1,11 @@
-import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
-from pathlib import Path
-from sc_linac_physics.applications.field_emission.csv_reader import (
-    read_from_csv,
+
+from sc_linac_physics.applications.field_emission.constants import (
+    CAV_RANGE,
+    CSV_DATE_FORMAT,
+    CSV_OUTPUT_DIR,
+    RAD_READ_TYPES,
 )
 from sc_linac_physics.utils.sc_linac.linac_utils import (
     build_cavity_pv_prefix,
@@ -13,22 +15,10 @@ from lcls_tools.common.data.archiver import get_values_over_time_range
 
 """
 08/06/26 - Kvetta Q
-Reads .csv (structured: COMMENT, CRYOMODULE, DATE MM/DD/YY, START_TIME, STOP_TIME, DECARAD)
-and calls fetch method to request archiver data of cryomodule amplitude (MV) vs radiation. If time
-is not listed in .csv, time is start date listed in .csv file + 24 hours. Most helpful if used
-after start and stop times for cavities are known (or after running amp_vs_time).
+Builds process variables and calls fetch method to request archiver data of cryomodule amplitude (MV)
+vs radiation. If time is not listed in .csv, time is start date listed in .csv file + 24 hours. Most
+helpful if used after start and stop times for cavities are known (or after running amp_vs_time).
 """
-
-_DATA_DIR = Path(__file__).resolve().parent
-DEFAULT_INPUT_CSV = _DATA_DIR / "All FE measurements by CM.csv"
-DEFAULT_OUTPUT_FOLDER = _DATA_DIR
-
-
-def is_date_valid(start_date, end_date):
-    """end date before start date ->  send error"""
-    if start_date > end_date:
-        raise ValueError("Start date is greater than end date")
-    return start_date, end_date
 
 
 def build_amplitude_pvs(cryomodule):
@@ -38,7 +28,7 @@ def build_amplitude_pvs(cryomodule):
         (linac for linac, cms in LINAC_TUPLES if cryomodule in cms), "L1B"
     )
 
-    for cavity in range(1, 9):
+    for cavity in CAV_RANGE:
         amplitude_pv.append(
             build_cavity_pv_prefix(sel_linac, cryomodule, cavity) + "AACTMEAN"
         )
@@ -125,46 +115,12 @@ def plot_amp_vs_rad(aligned_data):
     plt.close(fig)
 
 
-def file_handling(summary_str):
-    """establish input and output folders"""
-    parser = argparse.ArgumentParser(summary_str)
-    parser.add_argument(
-        "-i",
-        "--input",
-        type=Path,
-        default=DEFAULT_INPUT_CSV,
-        help="Path to the input file(s)",
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        type=Path,
-        default=DEFAULT_OUTPUT_FOLDER,
-        help="Path to the output folder",
-    )
-    args = parser.parse_args()
-    if not args.input.exists():
-        raise FileNotFoundError(f"Input file not found at {args.input}")
-    args.output.mkdir(parents=True, exist_ok=True)
-    return args
-
-
-def main():
-    summary = "Plot amplitude vs radiation from .csv file"
-    arg = file_handling(summary)
-
-    rad_chans = list(range(1, 11))
-    rad_readout = "average"
-    # cryomod: str = "18"
-    # dec = 2
-    # start = datetime(2025,2,6,14,17)
-    # end = datetime(2025,2,6,15,4)
-    # delta = timedelta(seconds=1)
-
-    for cryomod, dec, start, end, stamp in read_from_csv(arg.input):
-        print(f"Processing CM{cryomod} {start} -> {end}")
-        amp_pvs = build_amplitude_pvs(cryomod)
-        rad_pvs = build_rad_readout_pvs(dec, rad_chans, rad_readout)
+def generate_amp_vs_rad_csvs(cm, start, end, decarad, rad_chans):
+    print(f"Processing CM{cm} {start} -> {end}")
+    csv_date = start.strftime(CSV_DATE_FORMAT)
+    amp_pvs = build_amplitude_pvs(cm)
+    for readout in RAD_READ_TYPES:
+        rad_pvs = build_rad_readout_pvs(decarad, rad_chans, readout)
 
         pv_lists = []
         for amp_pv in amp_pvs:
@@ -175,12 +131,7 @@ def main():
             dataframes = fetch_pv_data(p_list, start, end)
             aligned_time_data = align_pvs_to_common_time(dataframes)
             csv_path = (
-                arg.output
-                / f"cm{cryomod}_{stamp}_cavity{cav_num}_{rad_readout}.csv"
+                CSV_OUTPUT_DIR
+                / f"cm{cm}_{csv_date}_cavity{cav_num}_{readout}.csv"
             )
             aligned_time_data.to_csv(csv_path)
-    #        plot_amp_vs_rad(aligned_time_data)
-
-
-if __name__ == "__main__":
-    main()
