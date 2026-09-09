@@ -26,7 +26,7 @@ with open(ALL_CM_CSV) as csvfile:
     reader = csv.reader(csvfile)
     next(reader)  # skip header
     for row in reader:
-        if len(row) < 12 or row[1] == "#":  # skip malformed rows
+        if len(row) < 12 or row[0] == "#":  # skip malformed rows
             continue
         cm_str = row[1].replace("CM", "").strip()
         try:
