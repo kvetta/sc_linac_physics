@@ -117,6 +117,7 @@ def plot_amp_vs_rad(aligned_data):
 
 
 def generate_amp_vs_rad_csvs(cm, start, end, decarad):
+    """combine methods for portable amplitude and radiation generation"""
     print(f"Processing CM{cm} {start} -> {end}")
     csv_date = start.strftime(CSV_DATE_FORMAT)
     amp_pvs = build_amplitude_pvs(cm)
