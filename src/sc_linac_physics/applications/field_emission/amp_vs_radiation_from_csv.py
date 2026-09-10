@@ -6,6 +6,7 @@ from sc_linac_physics.applications.field_emission.constants import (
     CSV_DATE_FORMAT,
     CSV_OUTPUT_DIR,
     RAD_READ_TYPES,
+    RAD_CHAN_RANGE,
 )
 from sc_linac_physics.utils.sc_linac.linac_utils import (
     build_cavity_pv_prefix,
@@ -115,12 +116,12 @@ def plot_amp_vs_rad(aligned_data):
     plt.close(fig)
 
 
-def generate_amp_vs_rad_csvs(cm, start, end, decarad, rad_chans):
+def generate_amp_vs_rad_csvs(cm, start, end, decarad):
     print(f"Processing CM{cm} {start} -> {end}")
     csv_date = start.strftime(CSV_DATE_FORMAT)
     amp_pvs = build_amplitude_pvs(cm)
     for readout in RAD_READ_TYPES:
-        rad_pvs = build_rad_readout_pvs(decarad, rad_chans, readout)
+        rad_pvs = build_rad_readout_pvs(decarad, RAD_CHAN_RANGE, readout)
 
         pv_lists = []
         for amp_pv in amp_pvs:
