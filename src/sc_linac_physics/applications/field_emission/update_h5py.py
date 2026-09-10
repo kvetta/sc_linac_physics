@@ -13,8 +13,8 @@ from sc_linac_physics.applications.field_emission.constants import (
 
 """
 07/13/26 - Kvetta Q
-Converts .CSVs from amp_vs_radiation_from_csv.py to .hdf5 file. Follows CM --> DATE --> CAVITY --> AVERAGE
-READOUT/INSTANT READOUT hierarchy for a folder of .CSVs with specific naming convention
+Converts .CSVs from amp_vs_radiation_from_csv.py to .hdf5 file. Follows CM --> DATE --> CAVITY
+--> AVERAGE READOUT/INSTANT READOUT hierarchy for a folder of .CSVs with specific naming convention
 ex: cm08_23_10_06_08_42_cavity7_average.csv.
 """
 
