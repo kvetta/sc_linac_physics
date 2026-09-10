@@ -40,7 +40,7 @@ NUM_FIT_POINTS = 250  # how many data points in fit line
 NUM_FIT_ITERATIONS = 5500  # how many tries scipy curve fit takes to converge
 
 # Regex Patterns
-DATA_CSV_NAME = re.compile(
+DATA_CSV_NAME_PATTERN = re.compile(
     r"cm(\d+|\w+)_(\d+_\d+_\d+_\d+_\d+)_cavity(\d+)_(\w+)\.csv"
 )
 ELOG_PATTERN = re.compile(
