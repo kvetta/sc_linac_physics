@@ -27,7 +27,7 @@ def parse_csv(all_cm_csv):
             reader = csv.reader(csvfile)
             next(reader)  # skip header
             for row in reader:
-                if len(row) < 11 or "#" in row[0]:  # skip malformed rows
+                if "#" in row[0]:  # skip commented rows
                     continue
                 cm_str = row[0].replace("CM", "").strip()
                 try:
@@ -50,11 +50,11 @@ def receive_metadata_input(input_row):
         key = _format_metadata_lookup_key(cm_str, input_row[1], input_row[2])
         metadata_lookup[key] = input_row
     except ValueError:
-        pass
+        pass  # if date or time missing/corrupted, skip and provide empty lookup
     return metadata_lookup
 
 
-def convert_to_h5(metadata_lookup):  # , output_h5_name, input_csv_path):
+def convert_to_h5(metadata_lookup):
     """convert metadata lookup table to h5 addition"""
     input_csvs = glob.glob(os.path.join(CSV_OUTPUT_DIR, "*.csv"))
 

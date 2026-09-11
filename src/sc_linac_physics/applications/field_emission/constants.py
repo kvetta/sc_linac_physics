@@ -30,6 +30,7 @@ RAD_READ_TYPES = ["average", "instant"]
 CSV_DATE_FORMAT = "%y_%m_%d_%H_%M"
 H5_DATE_FORMAT = "%Y-%m-%d_%H%M"
 DISPLAY_DATE_FORMAT = "%A, %B %d, %Y"
+STANDARD_DATE_FORMAT = "%m/%d/%y %H:%M"
 
 # Measurements
 AMPLITUDE_THRESHOLD = 4  # below this MVoltage, the cavity is considered off
